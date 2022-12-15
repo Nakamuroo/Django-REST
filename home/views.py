@@ -93,7 +93,6 @@ class author_list(generics.ListAPIView):
 
 
 class AuthorDetail(generics.RetrieveAPIView):
-    """ Получить информацию о авторе по его id """
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
 

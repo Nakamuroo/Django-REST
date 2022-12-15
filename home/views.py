@@ -58,7 +58,6 @@ class BookListView(generics.ListAPIView):
         return Book.objects.all()
 
 
-@csrf_exempt
 def book_detail(request, pk):
     """
     Retrieve, update or delete a code book.
@@ -85,7 +84,6 @@ def book_detail(request, pk):
         return HttpResponse(status=204)
 
 
-@csrf_exempt
 def author_list(request):
     """
     List all code books, or create a new book.
@@ -104,7 +102,6 @@ def author_list(request):
         return JsonResponse(serializer.errors, status=400)
 
 
-@csrf_exempt
 def author_detail(request, pk):
     """
     Retrieve, update or delete a code book.

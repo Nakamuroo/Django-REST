@@ -2,8 +2,8 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path(r'auth/', include('djoser.urls')),
-    path(r'auth/', include('djoser.urls.authtoken')),
+    path(r'auth/', include('rest_framework.urls')),
+    # path(r'auth/', include('djoser.urls.authtoken')),
 
     path('books/create/', views.BookCreate.as_view()),
     path('books/', views.BookListView.as_view()),

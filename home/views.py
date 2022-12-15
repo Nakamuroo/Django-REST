@@ -5,7 +5,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.generics import CreateAPIView
 from rest_framework.parsers import JSONParser, FormParser, MultiPartParser, FileUploadParser
 from rest_framework.response import Response
-
+from rest_framework import generics, filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
@@ -51,8 +51,8 @@ class AuthorCreate(generics.ListCreateAPIView):
 
 class BookListView(generics.ListAPIView):
     serializer_class = BookSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['author__name', 'title', 'genre']
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['author__name', 'title', 'genre']
 
     def get_queryset(self):
         return Book.objects.all()
@@ -84,45 +84,58 @@ def book_detail(request, pk):
         return HttpResponse(status=204)
 
 
-def author_list(request):
-    """
-    List all code books, or create a new book.
-    """
-    if request.method == 'GET':
-        authors = Author.objects.all()
-        serializer = AuthorSerializer(authors, many=True)
-        return JsonResponse(serializer.data, safe=False)
+class author_list(generics.ListAPIView):
+    serializer_class = AuthorSerializer
+    filter_backends = [DjangoFilterBackend]
 
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = AuthorSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+    def get_queryset(self):
+        return Author.objects.all()
 
 
-def author_detail(request, pk):
-    """
-    Retrieve, update or delete a code book.
-    """
-    try:
-        author = Book.objects.get(pk=pk)
-    except Book.DoesNotExist:
-        return HttpResponse(status=404)
+class AuthorDetail(generics.RetrieveAPIView):
+    """ Получить информацию о авторе по его id """
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
 
-    if request.method == 'GET':
-        serializer = BookSerializer(author)
-        return JsonResponse(serializer.data)
+# def author_list(request):
+#     """
+#     List all code books, or create a new book.
+#     """
+#     if request.method == 'GET':
+#         authors = Author.objects.all()
+#         serializer = AuthorSerializer(authors, many=True)
+#         return JsonResponse(serializer.data, safe=False)
+#
+#     elif request.method == 'POST':
+#         data = JSONParser().parse(request)
+#         serializer = AuthorSerializer(data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return JsonResponse(serializer.data, status=201)
+#         return JsonResponse(serializer.errors, status=400)
 
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = BookSerializer(author, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
 
-    elif request.method == 'DELETE':
-        author.delete()
-        return HttpResponse(status=204)
+# def author_detail(request, pk):
+#     """
+#     Retrieve, update or delete a code book.
+#     """
+#     try:
+#         author = Book.objects.get(pk=pk)
+#     except Book.DoesNotExist:
+#         return HttpResponse(status=404)
+#
+#     if request.method == 'GET':
+#         serializer = BookSerializer(author)
+#         return JsonResponse(serializer.data)
+#
+#     elif request.method == 'PUT':
+#         data = JSONParser().parse(request)
+#         serializer = BookSerializer(author, data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return JsonResponse(serializer.data)
+#         return JsonResponse(serializer.errors, status=400)
+#
+#     elif request.method == 'DELETE':
+#         author.delete()
+#         return HttpResponse(status=204)
